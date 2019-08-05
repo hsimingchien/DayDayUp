@@ -1,0 +1,830 @@
+Overview
+The Network Function (NF) Repository Function (NRF) is the network entity in the 5G Core Network (5GC) supporting the following functionality:
+
+网络功能（NF）存储库功能（NRF）是5G核心网络（5GC）中的网络实体，支持以下功能：
+-	Maintains the NF profile of available NF instances and their supported services;
+
+ - 维护可用NF实例及其支持服务的NF配置文件;
+-	Allows other NF instances to subscribe to, and get notified about, the registration in NRF of new NF instances of a given type;  
+
+ - 允许其他NF实例订阅并获得有关给定类型的新NF实例在NRF中注册的通知;
+-	Supports service discovery function. It receives NF Discovery Requests from NF instances, and provides the information of the available NF instances fulfilling certain criteria (e.g., supporting a given service).
+
+ - 支持服务发现功能。它从NF实例接收NF发现请求，并提供满足特定标准的可用NF实例的信息（例如，支持给定服务）。
+Figures 4-1 shows the reference architecture for the 5GC, with focus on the NRF:
+
+图4-1显示了5GC的参考架构，重点是NRF：
+
+Figure 4-1: 5G System architecture
+
+图4-1：5G系统架构
+For the sake of clarity, the NRF is never depicted in reference point representation figures, given that the NRF interacts with every other NF in the 5GC. As an exception, in the roaming case, the reference point between the vNRF and the hNRF is named as N27. The reference point name of N27 is used only for representation purposes, but its functionality is included in the services offered by the Nnrf Service-Based Interface.
+
+为了清楚起见，NRF从未在参考点表示图中描述，假设NRF与5GC中的每个其他NF相互作用。作为例外，在漫游情况下，vNRF和hNRF之间的参考点被命名为N27。 N27的参考点名称仅用于表示目的，但其功能包含在Nnrf基于服务的接口提供的服务中。
+5	Services Offered by the NRF
+
+5 NRF提供的服务
+5.1	Introduction
+The NRF offers to other NFs the following services:
+
+NRF向其他NF提供以下服务：
+-	Nnrf_NFManagement
+-	Nnrf_NFDiscovery
+-	OAuth2 Authorization
+
+ -  OAuth2授权
+5.2	Nnrf_NFManagement Service
+
+5.2 Nnrf_NFManagement服务
+5.2.1	Service Description
+
+5.2.1服务描述
+The Nnrf_NFManagement service allows a Network Function Instance in the serving PLMN to register, update or deregister its profile in the NRF.
+
+Nnrf_NFManagement服务允许服务PLMN中的网络功能实例在NRF中注册，更新或注销其简档。
+The Nnrf_NFManagement service also allows an NRF Instance to register, update or deregister its profile in another NRF in the same PLMN.NOTE:	Alternatively, other means such as OA&M can also be used to register, update or deregister NRF profile in another NRF.
+
+Nnrf_NFManagement服务还允许NRF实例在同一PLMN中的另一个NRF中注册，更新或注销其配置文件。备注：或者，其他方式如OA
+It also allows an NF to subscribe to be notified of newly registered NF Instances along with their NF services.
+
+它还允许NF订阅以通知新注册的NF实例及其NF服务。
+The NF profile consists of general parameters of the NF Instance, and also the parameters of the different services exposed by the NF Instance. 
+
+NF配置文件由NF实例的一般参数以及NF实例公开的不同服务的参数组成。
+The PLMN of the NRF may comprise one or multiple PLMN IDs (i.e. MCC and MNC). An NRF configured with multiple PLMN IDs shall support registering, updating and deregistering the profile of Network Function Instances from any of these PLMN IDs. 
+
+NRF的PLMN可以包括一个或多个PLMN ID（即MCC和MNC）。配置有多个PLMN ID的NRF应支持从这些PLMN ID中的任何一个注册，更新和注销网络功能实例的简档。
+The Nnrf_NFManagement service also allows retrieving a list of NF instances currently registered in the NRF or the NF Profile of a given NF instance.
+
+Nnrf_NFManagement服务还允许检索当前在NRF中注册的NF实例列表或给定NF实例的NF配置文件。
+5.2.2	Service Operations
+
+5.2.2服务运营
+5.2.2.1	Introduction
+
+5.2.2.1简介
+The services operations defined for the Nnrf_NFManagement service are as follows:
+
+为Nnrf_NFManagement服务定义的服务操作如下：
+-	NFRegister: It allows an NF Instance to register its NF profile in the NRF; it includes the registration of the general parameters of the NF Instance, together with the list of services exposed by the NF Instance. This service operation is not allowed to be invoked from an NRF in a different PLMN.
+
+ -  NFRegister：它允许NF实例在NRF中注册其NF配置文件;它包括注册NF实例的一般参数，以及NF实例公开的服务列表。不允许从不同PLMN中的NRF调用该服务操作。
+-	NFUpdate: It allows an NF Instance to replace, or update partially, the parameters of its NF profile (including the parameters of the associated services) in the NRF; it also allows to add or delete individual services offered by the NF Instance. This service operation is not allowed to be invoked from an NRF in a different PLMN.
+
+ -  NFUpdate：它允许NF实例在NRF中替换或部分更新其NF配置文件的参数（包括相关服务的参数）;它还允许添加或删除NF实例提供的各个服务。不允许从不同PLMN中的NRF调用该服务操作。
+-	NFDeregister: It allows an NF Instance to deregister its NF profile in the NRF, including the services offered by the NF Instance. This service operation is not allowed to be invoked from an NRF in a different PLMN.
+
+ -  NFDeregister：它允许NF实例注销其在NRF中的NF配置文件，包括NF实例提供的服务。不允许从不同PLMN中的NRF调用该服务操作。
+-	NFStatusSubscribe: It allows an NF Instance to subscribe to changes on the status of NF Instances registered in NRF. This service operation can be invoked by an NF Instance in a different PLMN (via the local NRF in that PLMN).
+
+ -  NFStatusSubscribe：它允许NF实例订阅NRF中注册的NF实例状态的变化。该服务操作可以由不同PLMN中的NF实例（通过该PLMN中的本地NRF）调用。
+-	NFStatusNotify: It allows the NRF to notify subscribed NF Instances of changes on the status of NF Instances. This service operation can be invoked directly between the NRF and an NF Instance in a different PLMN (without involvement of the local NRF in that PLMN).
+
+ -  NFStatusNotify：它允许NRF向订阅的NF实例通知NF实例状态的变化。可以在NRF和不同PLMN中的NF实例之间直接调用该服务操作（不涉及该PLMN中的本地NRF）。
+-	NFStatusUnsubscribe: It allows an NF Instance to unsubscribe to changes on the status of NF Instances registered in NRF. This service operation can be invoked by an NF Instance in a different PLMN (via the local NRF in that PLMN).
+
+ -  NFStatusUnsubscribe：它允许NF实例取消订阅NRF中注册的NF实例状态的更改。该服务操作可以由不同PLMN中的NF实例（通过该PLMN中的本地NRF）调用。
+NOTE 1:	The "change of status" of the NFStatus service operations can imply a request to be notified of newly registered NF Instances in NRF, or to be notified of profile changes of a specific NF Instance, or to be notified of the deregistration of an NF Instance. 
+
+注1：NFStatus服务操作的“状态变化”可能意味着要求通知NRF中新注册的NF实例，或者通知特定NF实例的配置文件更改，或者通知注销注册一个NF实例。
+NOTE 2:	An NRF instance can also use the NFRegister, NFUpdate or NFDeregister service operations or OA&M system to register, update or deregister its profile in another NRF in the same PLMN.
+
+注2：NRF实例也可以使用NFRegister，NFUpdate或NFDeregister服务操作或OA
+-	NFListRetrieval: It allows retrieving a list of NFs currently registered in the NRF. This service operation is not allowed to be invoked from an NRF in a different PLMN.
+
+ -  NFListRetrieval：它允许检索当前在NRF中注册的NF列表。不允许从不同PLMN中的NRF调用该服务操作。
+-	NFProfileRetrieval: It allows retrieving the NF Profile of a given NF instance. This service operation is not allowed to be invoked from an NRF in a different PLMN.
+
+ -  NFProfileRetrieval：它允许检索给定NF实例的NF配置文件。不允许从不同PLMN中的NRF调用该服务操作。
+The NFStatusSubscribe / NFstatusNotify / NFStatusUnsubscribe operations can be invoked by an NF Service Consumer (i.e., "source NF") requesting to be notified about events (registration, deregistration, profile change) related to an NF instance (i.e., "target NF") located in the same PLMN, or in a different PLMN.
+
+NF服务消费者（即“源NF”）可以调用NFStatusSubscribe / NFstatusNotify / NFStatusUnsubscribe操作，请求通知与NF实例相关的事件（注册，注销，配置文件更改）（即“目标NF”）位于同一PLMN或不同的PLMN中。
+In the description of these operations in subclauses 5.2.2.5, 5.2.2.6 and 5.2.2.7, when the NF instances are located in the same PLMN, both source NF and target NF are said to be located in the "Serving PLMN" but, in the general case, the functionality is not restricted to the PLMN that is serving a given UE, and it shall be applicable as well to any scenario in which source NF and target NFs belong to the same PLMN.
+
+在5.2.2.5,5.2.2.6和5.2.2.7中的这些操作的描述中，当NF实例位于同一PLMN中时，源NF和目标NF都被称为位于“服务PLMN”中，但是，在一般情况下，功能不限于服务给定UE的PLMN，并且它也适用于源NF和目标NF属于同一PLMN的任何场景。
+When source NF and target NF are located in different PLMNs, the source NF is said to be in the "Serving PLMN", and the target NF (and the NRF where such NF is registered) is said to be in the "Home PLMN", similarly to the scenarios described in 3GPP TS 23.502 [2], but the functionality shall be equally applicable to any scenario between any pair of PLMNs (e.g. with the source NF in the Home PLMN and the target NF in the Serving PLMN).
+
+当源NF和目标NF位于不同的PLMN中时，源NF被称为在“服务PLMN”中，并且目标NF（以及注册了这种NF的NRF）被称为在“归属PLMN”中。类似于3GPP TS 23.502 [2]中描述的场景，但是该功能应同样适用于任何PLMN对之间的任何场景（例如，具有归属PLMN中的源NF和服务PLMN中的目标NF）。
+5.2.2.2	NFRegister
+5.2.2.2.1	General
+This service operation is used:
+
+使用此服务操作：
+-	to register an NF in the NRF by providing the NF profile of the requesting NF to the NRF, and the NRF marks the requesting NF as available to be discovered by other NFs;
+
+ - 通过向NRF提供请求NF的NF概况来在NRF中注册NF，并且NRF将请求NF标记为可由其他NF发现;
+-	to register services associated to an existing NF Instance;
+
+ - 注册与现有NF实例相关的服务;
+-	to register NRF information in another NRF, and this information is used for forwarding or redirecting service discovery request.
+
+ - 在另一个NRF中注册NRF信息，该信息用于转发或重定向服务发现请求。
+5.2.2.2.2	NF (other than NRF) registration to NRF
+
+5.2.2.2.2 NF（NRF除外）注册到NRF
+
+Figure 5.2.2.2.2-1: NF Instance Registration 
+
+图5.2.2.2.2-1：NF实例注册
+1.	The NF Service Consumer shall send a PUT request to the resource URI representing the NF Instance. The URI is determined by the NF Instance. The variable {nfInstanceID} represents an identifier, provided by the NF Service Consumer, that shall be globally unique inside the PLMN of the NRF where the NF is being registered. The format of the NF Instance ID shall be a Universally Unique Identifier (UUID) version 4, as described in IETF RFC 4122 [18].
+
+1. NF服务消费者应向表示NF实例的资源URI发送PUT请求。 URI由NF实例确定。变量{nfInstanceID}表示由NF服务消费者提供的标识符，该标识符在注册NF的NRF的PLMN内是全局唯一的。 NF实例ID的格式应为通用唯一标识符（UUID）版本4，如IETF RFC 4122 [18]中所述。
+EXAMPLE:	UUID version 4: "4947a69a-f61b-4bc1-b9da-47c9c5d14b64"
+
+示例：UUID版本4：“4947a69a-f61b-4bc1-b9da-47c9c5d14b64”
+The payload body of the PUT request shall contain a representation of the NF Instance to be created.
+
+PUT请求的有效负载主体应包含要创建的NF实例的表示。
+2.	On success, "201 Created" shall be returned, the payload body of the PUT response shall contain the representation of the created resource and the "Location" header shall contain the URI of the created resource. Additionally, the NRF returns a "heart-beat timer" containing the number of seconds expected between two consecutive heart-beat messages from an NF Instance to the NRF (see subclause 5.2.2.3.2). The representation of the created resource may be a complete NF Profile or a NF Profile just including the mandatory attributes of the NF Profile and the attributes which the NRF added or changed (see Annex B).
+
+2.成功时，应返回“201 Created”，PUT响应的有效负载主体应包含所创建资源的表示，“Location”头应包含所创建资源的URI。此外，NRF返回一个“心跳计时器”，其中包含从NF实例到NRF的两个连续心跳消息之间预期的秒数（参见子条款5.2.2.3.2）。创建的资源的表示可以是完整的NF简档或NF简档，其仅包括NF简档的强制属性和NRF添加或改变的属性（参见附录B）。
+If the registration of the NF instance fails at the NRF due to errors in the encoding of the NFProfile JSON object, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NFProfile JSON对象的编码错误而导致NF实例的注册在NRF处失败，则NRF将返回“400 Bad Request”状态代码，ProblemDetails IE提供错误的详细信息。
+If the registration of the NF instance fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error. 
+
+如果NF实例的注册由于NRF内部错误而在NRF处失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+The NRF shall allow the registration of a Network Function instance with any of the NF types described in subclause 6.1.6.3.3, and it shall also allow registration of Network Function instances with custom NF types (e.g., NF type values not defined by 3GPP, or NF type values not defined by this API version).
+
+NRF应允许使用子条款6.1.6.3.3中描述的任何NF类型注册网络功能实例，并且还应允许使用自定义NF类型注册网络功能实例（例如，3GPP类型值未定义的NF类型值） ，或此API版本未定义的NF类型值）。
+NOTE:	When registering a custom NF in NRF, it is recommended to use a NF type name that prevents collisions with other custom NF type names, or with NF types defined in the future by 3GPP. E.g., prefixing the custom NF type name with the string "CUSTOM_".
+
+注意：在NRF中注册自定义NF时，建议使用NF类型名称，以防止与其他自定义NF类型名称冲突，或与3GPP未来定义的NF类型冲突。例如，在自定义NF类型名称前加上字符串“CUSTOM_”。
+During the registration of a Network Function instance with a custom NF type, the NF instance may provide NF-specific data (in the "customInfo" attribute), that shall be stored by the NRF as part of the NF profile of the NF instance.
+
+在使用自定义NF类型注册网络功能实例期间，NF实例可以提供NF特定数据（在“customInfo”属性中），该数据应由NRF存储为NF实例的NF配置文件的一部分。
+5.2.2.2.3	NRF registration to another NRF
+
+5.2.2.2.3 NRF向另一个NRF注册
+The procedure specified in subclause 5.2.2.2.2 applies. Additionally:
+
+子条款5.2.2.2.2中规定的程序适用。另外：
+a)	the registering NRF shall set the nfType to "NRF" in the nfProfile;
+
+a）注册NRF应在nfProfile中将nfType设置为“NRF”;
+b)	the registering NRF shall set the nfService to contain "nnrf-disc" and "nnrf-nfm" in the nfProfile;
+
+b）注册NRF应将nfService设置为在nfProfile中包含“nnrf-disc”和“nnrf-nfm”;
+c)	the registering NRF may include nrfInfo which contains the information of udrInfo, udmInfo, ausfInfo, amfInfo, smfInfo, upfInfo, pcfInfo, bsfInfo and chInfo in the nfProfile locally configured in the NRF or the NRF received during registration of other NFs, this means the registering NRF is able to provide service for discovery of NFs subject to that information;
+
+c）注册NRF可以包括nrfInfo，其包含在NRF中本地配置的nfProfile或在其他NF注册期间接收的NRF中的udrInfo，udmInfo，ausfInfo，amfInfo，smfInfo，upfInfo，pcfInfo，bsfInfo和chInfo的信息，这意味着登记的NRF能够为发现受该信息约束的NF提供服务;
+d)	if the NRF receives an NF registration with the nfType set to "NRF", the NRF shall use the information contained in the nfProfile to target the registering NRF when forwarding or redirecting NF service discovery request.
+
+d）如果NRF收到nfType设置为“NRF”的NF注册，则NRF应在转发或重定向NF服务发现请求时使用nfProfile中包含的信息来定位注册的NRF。
+5.2.2.3	NFUpdate
+5.2.2.3.1	General
+This service operation updates the profile of a Network Function previously registered in the NRF by providing the updated NF profile of the requesting NF to the NRF. The update operation may apply to the whole profile of the NF (complete replacement of the existing profile by a new profile), or it may apply only to a subset of the parameters of the profile (including adding/deleting/replacing services to the NF profile).
+
+该服务操作通过向NRF提供请求NF的更新的NF简档来更新先前在NRF中登记的网络功能的简档。更新操作可以应用于NF的整个配置文件（通过新配置文件完全替换现有配置文件），或者它可以仅应用于配置文件的参数的子集（包括向NF添加/删除/替换服务）轮廓）。
+To perform a complete replacement of the NF Profile of a given NF Instance, the NF Service Consumer shall issue an HTTP PUT request, as shown in Figure 5.2.2.3.1-1:
+
+要完全替换给定NF实例的NF配置文件，NF服务消费者应发出HTTP PUT请求，如图5.2.2.3.1-1所示：
+
+
+Figure 5.2.2.3.1-1: NF Profile Complete Replacement
+
+图5.2.2.3.1-1：NF配置文件完全替换
+1.	The NF Service Consumer shall send a PUT request to the resource URI representing the NF Instance. The payload body of the PUT request shall contain a representation of the NF Instance to be completely replaced in the NRF.
+
+1. NF服务消费者应向表示NF实例的资源URI发送PUT请求。 PUT请求的有效载荷主体应包含要在NRF中完全替换的NF实例的表示。
+2a.	On success, "200 OK" shall be returned, the payload body of the PUT response shall contain the representation of the replaced resource. The representation of the replaced resource may be a complete NF Profile or a NF Profile just including the mandatory attributes of the NF Profile and the attributes which the NRF added or changed (see Annex B).
+
+2A。成功时，应返回“200 OK”，PUT响应的有效载荷主体应包含被替换资源的表示。替换资源的表示可以是完整的NF简档或NF简档，其仅包括NF简档的强制属性和NRF添加或改变的属性（参见附录B）。
+2b.	If the update of the NF instance fails at the NRF due to errors in the encoding of the NFProfile JSON object, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果由于NFProfile JSON对象的编码错误而导致NF实例的更新在NRF处失败，则NRF将返回“400 Bad Request”状态代码，ProblemDetails IE提供错误的详细信息。
+If the update of the NF instance fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误导致NF实例的更新在NRF上失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+To perform a partial update of the NF Profile of a given NF Instance, the NF Service Consumer shall issue an HTTP PATCH request, as shown in Figure 5.2.2.3.1-2. This partial update shall be used to add/delete/replace individual parameters of the NF Instance, and also to add/delete/replace any of the services (and their parameters) offered by the NF Instance.
+
+要执行给定NF实例的NF配置文件的部分更新，NF服务消费者应发出HTTP PATCH请求，如图5.2.2.3.1-2所示。此部分更新应用于添加/删除/替换NF实例的各个参数，以及添加/删除/替换NF实例提供的任何服务（及其参数）。
+
+
+Figure 5.2.2.3.1-2: NF Profile Partial Update
+
+图5.2.2.3.1-2：NF配置文件部分更新
+1.	The NF Service Consumer shall send a PATCH request to the resource URI representing the NF Instance. The payload body of the PATCH request shall contain the list of operations (add/delete/replace) to be applied to the NF Profile of the NF Instance; these operations may be directed to individual parameters of the NF Profile or to the list of services (and their parameters) offered by the NF Instances. In order to leave the NF Profile in a consistent state, all the operations specified by the PATCH request body shall be executed atomically.
+
+1. NF服务消费者应向表示NF实例的资源URI发送PATCH请求。 PATCH请求的有效载荷主体应包含要应用于NF实例的NF配置文件的操作列表（添加/删除/替换）;这些操作可以针对NF配置文件的各个参数或NF实例提供的服务列表（及其参数）。为了使NF配置文件保持一致状态，PATCH请求主体指定的所有操作都应以原子方式执行。
+2a.	On success, "200 OK" shall be returned, the payload body of the PATCH response shall contain the representation of the replaced resource. 
+
+2A。成功时，应返回“200 OK”，PATCH响应的有效负载主体应包含被替换资源的表示。
+2b.	If the NF Instance, identified by the "nfInstanceID", is not found in the list of registered NF Instances in the NRF's database, the NRF shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果在NRF数据库中注册的NF实例列表中找不到由“nfInstanceID”标识的NF实例，则NRF将返回“404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.3.2	NF Heart-Beat
+
+5.2.2.3.2 NF心跳
+Each NF that has previously registered in NRF shall contact the NRF periodically (heart-beat), by invoking the NFUpdate service operation, in order to show that the NF is still operative. 
+
+先前在NRF中注册的每个NF应通过调用NFUpdate服务操作定期（心跳）联系NRF，以显示NF仍然有效。
+The time interval at which the NRF shall be contacted is deployment-specific, and it is returned by the NRF to the NF Service Consumer as a result of a successful registration. 
+
+应联系NRF的时间间隔是特定于部署的，并且由于成功注册，NRF将其返回给NF服务消费者。
+When the NRF detects that a given NF has not updated its profile for a configurable amount of time (longer than the heart-beat interval), the NRF changes the status of the NF to SUSPENDED and considers that the NF and its services can no longer be discovered by other NFs via the NFDiscovery service. The NRF notifies NFs subscribed to receiving notifications of changes of the NF Profile that the NF status has been changed to SUSPENDED.
+
+当NRF检测到给定的NF未在可配置的时间内（长于心跳间隔）更新其配置文件时，NRF将NF的状态更改为SUSPENDED并认为NF及其服务不再通过NFDiscovery服务被其他NF发现。 NRF通知已订阅接收NF配置文件更改通知的NF，NF状态已更改为SUSPENDED。
+If the NRF modifies the heart-beat interval value of a given NF instance currently registered (e.g. as a result of an OA&M operation), it shall return the new value to the registered NF in the response of the next periodic heart-beat interaction received from that NF and, until then, the NRF shall apply the heart-beat check procedure according to the original interval value.
+
+如果NRF修改当前登记的给定NF实例的心跳间隔值（例如，作为OA的结果）
+
+Figure 5.2.2.3.2-1: NF Heart-Beat
+
+图5.2.2.3.2-1：NF心跳
+1.	The NF Service Consumer shall send a PATCH request to the resource URI representing the NF Instance. The payload body of the PATCH request shall contain a "replace" operation on the "nfStatus" attribute of the NF Profile of the NF Instance, and set it to the value "REGISTERED" or "UNDISCOVERABLE".
+
+1. NF服务消费者应向表示NF实例的资源URI发送PATCH请求。 PATCH请求的有效负载主体应包含对NF实例的NF配置文件的“nfStatus”属性的“替换”操作，并将其设置为值“REGISTERED”或“UNDISCOVERABLE”。
+	In addition, the NF Service Consumer may also provide the load information of the NF, and/or the load information of the NF associated NF services.
+
+此外，NF服务消费者还可以提供NF的负载信息，和/或NF相关NF服务的负载信息。
+2a.	On success, the NRF should return "204 No Content"; the NRF may also answer with "200 OK" along with the full NF Profile, e.g. in cases where the NRF determines that the NF Profile has changed significantly since the last heart-beat, and wants to send the new profile to the NF Service Consumer (note that this alternative has bigger signalling overhead).
+
+2A。成功后，NRF应返回“204 No Content”; NRF也可以回答“200 OK”以及完整的NF Profile，例如在NRF确定自上次心跳以来NF配置文件发生了显着变化的情况下，并希望将新配置文件发送给NF服务消费者（请注意，此备选方案具有更大的信令开销）。
+2b.	If the NF Instance, identified by the "nfInstanceID", is not found in the list of registered NF Instances in the NRF's database, the NRF shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果在NRF数据库中注册的NF实例列表中找不到由“nfInstanceID”标识的NF实例，则NRF将返回“404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+EXAMPLE:
+PATCH .../nf-instances/4947a69a-f61b-4bc1-b9da-47c9c5d14b64
+
+补丁... / nf-instances / 4947a69a-f61b-4bc1-b9da-47c9c5d14b64
+Content-Type: application/json-patch+json
+
+Content-Type：application / json-patch json
+
+[
+  { "op": "replace", "path": "/nfStatus", "value": "REGISTERED" },
+
+  {“op”：“replace”，“path”：“/ nfStatus”，“value”：“REGISTERED”}，
+  { "op": "replace", "path": "/load", "value": 50 }
+
+  {“op”：“替换”，“路径”：“/ load”，“value”：50}
+]
+
+
+HTTP/2 204 No Content
+
+HTTP / 2 204无内容
+Content-Location: .../nf-instances/4947a69a-f61b-4bc1-b9da-47c9c5d14b64
+
+内容地点：... / nf-instances / 4947a69a-f61b-4bc1-b9da-47c9c5d14b64
+
+5.2.2.4	NFDeregister
+
+5.2.2.4 NFDeregister
+5.2.2.4.1	General
+This service operation removes the profile of a Network Function previously registered in the NRF.
+
+此服务操作删除先前在NRF中注册的网络功能的配置文件。
+It is executed by deleting a given resource identified by a "NF Instance ID". The operation is invoked by issuing a DELETE request on the URI representing the specific NF Instance.
+
+它通过删除由“NF实例ID”标识的给定资源来执行。通过在表示特定NF实例的URI上发出DELETE请求来调用该操作。
+
+
+Figure 5.2.2.4.1-1: NF Instance Deregistration
+
+图5.2.2.4.1-1：NF实例注销
+1.	The NF Service Consumer shall send a DELETE request to the resource URI representing the NF Instance. The request body shall be empty.
+
+1. NF服务消费者应向表示NF实例的资源URI发送DELETE请求。请求正文应为空。
+2a.	On success, "204 No Content" shall be returned. The response body shall be empty.
+
+2A。成功时，将退回“204 No Content”。响应主体应为空。
+2b.	If the NF Instance, identified by the "nfInstanceID", is not found in the list of registered NF Instances in the NRF's database, the NRF shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果在NRF数据库中注册的NF实例列表中找不到由“nfInstanceID”标识的NF实例，则NRF将返回“404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.5	NFStatusSubscribe
+
+5.2.2.5 NFStatusSubscribe
+5.2.2.5.1	General
+This service operation is used to:
+
+此服务操作用于：
+-	create a subscription so an NF Service Consumer can request to be notified when NF Instances of a given set, following certain filter criteria are registered/deregistered in NRF or when their profile is modified;
+
+ - 创建订阅，以便NF服务消费者可以请求在给定集合的NF实例，遵循某些过滤标准在NRF中注册/注销或其配置文件被修改时得到通知;
+-	create a subscription to a specific NF Instance so an NF Service Consumer can request to be notified when the profile of such NF Instance is modified or when the NF Instance is deregistered from NRF.
+
+ - 创建对特定NF实例的订阅，以便NF服务消费者可以请求在修改此类NF实例的配置文件或从NRF注销NF实例时收到通知。
+5.2.2.5.2	Subscription to NF Instances in the same PLMN
+
+5.2.2.5.2在同一PLMN中订阅NF实例
+The subscription to notifications on NF Instances is executed creating a new individual resource under the collection resource "subscriptions". The operation is invoked by issuing a POST request on the URI representing the "subscriptions" resource.
+
+执行对NF实例的通知的订阅，在集合资源“subscriptions”下创建新的个体资源。通过在表示“订阅”资源的URI上发出POST请求来调用该操作。
+
+Figure 5.2.2.5.2-1: Subscription to NF Instances in the same PLMN
+
+图5.2.2.5.2-1：同一PLMN中对NF实例的订阅
+1.	The NF Service Consumer shall send a POST request to the resource URI representing the "subscriptions" collection resource. 
+
+1. NF服务消费者应向表示“订阅”收集资源的资源URI发送POST请求。
+The request body shall include the data indicating the type of notifications that the NF Service Consumer is interested in receiving; it also contains a callback URI, where the NF Service Consumer shall be prepared to receive the actual notification from the NRF (see NFStatusNotify operation in 5.2.2.6) and it may contain a validity time, suggested by the NF Service Consumer, representing the time span during which the subscription is desired to be kept active.
+
+请求机构应包括指示NF服务消费者有兴趣接收的通知类型的数据;它还包含一个回调URI，其中NF服务消费者应准备好接收来自NRF的实际通知（参见5.2.2.6中的NFStatusNotify操作），它可能包含NF服务消费者建议的有效时间，代表时间期望订阅保持活动的范围。
+The subscription request may also include additional parameters indicating the list of attributes in the NF Profile to be monitored (or to be excluded from monitoring), in order to determine whether a notification from NRF should be sent, or not, when any of those attributes is changed in the profile.
+
+订阅请求还可以包括指示要监视（或从监视中排除）的NF配置文件中的属性列表的附加参数，以便确定当这些属性中的任何属性是否应该发送来自NRF的通知时。在配置文件中更改。
+The NF Service Consumer may request the creation of a subscription to a specific NF Instance, or to a set of NF Instances, where the set is determined according to different criteria specified in the request body, in the "subscrCond" attribute of the "SubscriptionData" object type (see subclause 6.1.6.2.16).
+
+NF服务使用者可以请求创建对特定NF实例或一组NF实例的订阅，其中该集合是根据请求正文中指定的不同标准在“SubscriptionData”的“subscrCond”属性中确定的。 “对象类型（见6.1.6.2.16）。
+The subscription shall be authorized, or rejected, by the NRF by checking the "reqNfType" and "reqNfFqdn" input attributes in the subscription request body (along with the contents of any optional Oauth2 access token provided in the API request) against the list of authorization attributes in the NF Profile of the target NF Instance to be monitored.
+
+NRF通过检查订阅请求正文中的“reqNfType”和“reqNfFqdn”输入属性（以及API请求中提供的任何可选Oauth2访问令牌的内容）来授权或拒绝订阅。要监视的目标NF实例的NF配置文件中的授权属性。
+When the subscription request is for a set of NFs, the authorization attributes of the NF Instances in the set may differ, resulting in positive authorization of the subscription for only a part of the NF Instances in the set; in that case, the subscription to the set of NFs may be accepted by the NRF, but the NF Instances in the set that are not authorized for the NF Service Consumer that requested the subscription, shall not result in triggering any notification event from the NRF to the NF Service Consumer.
+
+当订阅请求是针对一组NF时，该集合中的NF实例的授权属性可能不同，从而导致对该集合中的一部分NF实例的订阅的肯定授权;在这种情况下，NRF可以接受对NF集合的订阅，但是未经NF服务消费者授权请求订阅的集合中的NF实例不应导致触发来自NRF的任何通知事件到NF服务消费者。
+2a.	On success, "201 Created" shall be returned. The response shall contain the data related to the created subscription, including the validity time, as determined by the NRF, after which the subscription becomes invalid. Once the subscription expires, if the NF Service Consumer wants to keep receiving status notifications, it shall create a new subscription in the NRF.
+
+2A。成功时，将返回“201 Created”。响应应包含与创建的订阅相关的数据，包括由NRF确定的有效时间，之后订阅变为无效。订阅到期后，如果NF服务消费者希望继续接收状态通知，它将在NRF中创建新订阅。
+2b.	If the creation of the subscription fails at the NRF due to errors in the SubscriptionData JSON object in the request body, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果由于请求正文中的SubscriptionData JSON对象中的错误而导致订阅的创建在NRF处失败，则NRF将返回“400 Bad Request”状态代码，其中ProblemDetails IE提供错误的详细信息。
+If the creation of the subscription fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误而在NRF上创建订阅失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.5.3	Subscription to NF Instances in a different PLMN
+
+5.2.2.5.3在不同PLMN中订阅NF实例
+The subscription to notifications on NF Instances in a different PLMN is done by creating a resource under the collection resource "subscriptions", in the NRF of the Home PLMN.
+
+通过在归属PLMN的NRF中的收集资源“订阅”下创建资源来完成对不同PLMN中的NF实例的通知的订阅。
+For that, step 1 in subclause 5.2.2.5.2 is executed (send a POST request to the NRF in the Serving PLMN); this request shall include the identity of the PLMN of the home NRF in the SubscriptionData parameter in the request body.
+
+为此，执行子条款5.2.2.5.2中的步骤1（向服务PLMN中的NRF发送POST请求）;该请求应包括请求体中SubscriptionData参数中的归属NRF的PLMN的标识。
+Then, steps 1-2 in Figure 5.2.2.5.3-1 are executed, between the NRF in the Serving PLMN and the NRF in the Home PLMN. In this step, the presence of the PLMN ID in the SubscriptionData parameter is not required. The NRF in the Home PLMN returns a subscriptionID identifying the created subscription.
+
+然后，在服务PLMN中的NRF和归属PLMN中的NRF之间执行图5.2.2.5.3-1中的步骤1-2。在该步骤中，不需要在SubscriptionData参数中存在PLMN ID。归属PLMN中的NRF返回标识所创建的订阅的订阅ID。
+Finally, step 2 in subclause 5.2.2.5.2 is executed; a new subscriptionID shall be generated by the NRF in the Serving PLMN as indicated in step 2 of Figure 5.2.2.5.3-1, and shall be sent to the NF Service Consumer in the Serving PLMN.
+
+最后，执行子条款5.2.2.5.2中的步骤2;如图5.2.2.5.3-1的步骤2所示，NRF应在服务PLMN中生成新的subscriptionID，并将其发送给服务PLMN中的NF服务消费者。
+
+
+Figure 5.2.2.5.3-1: Subscription to NF Instances in a different PLMN
+
+图5.2.2.5.3-1：在不同PLMN中订阅NF实例
+1.	The NRF in Serving PLMN shall send a POST request to the resource URI in the NRF in Home PLMN representing the "subscriptions" collection resource. The request body shall include the SubscriptionData as received by the NRF in Serving PLMN from the NF Service Consumer in the Serving PLMN (see 5.2.2.5.2), containing the data about the type of notifications that the NF Service Consumer is interested in receiving and the callback URI where the NF Service Consumer shall be prepared to receive the notifications from the NRF (see NFStatusNotify operation in 5.2.2.6).
+
+1.服务PLMN中的NRF将向归属PLMN中的NRF中的资源URI发送POST请求，该归属PLMN表示“订阅”收集资源。请求正文应包括NRF在服务PLMN中从服务PLMN中的NF服务消费者接收的订阅数据（见5.2.2.5.2），其中包含有关NF服务消费者有兴趣接收的通知类型的数据。以及NF服务消费者应准备接收来自NRF的通知的回调URI（参见5.2.2.6中的NFStatusNotify操作）。
+2a.	On success, "201 Created" shall be returned. The NRF in Serving PLMN should not keep state for this created subscription and shall send to the NF Service Consumer in Serving PLMN (step 2 in 5.2.2.5.2) a subscriptionID that shall consist on the following structure: <MCC>+<MNC>+"-"+<OriginalSubscriptionID>
+
+2A。成功时，将返回“201 Created”。服务PLMN中的NRF不应该保留该创建的订阅的状态，并且应该在服务PLMN（5.2.2.5.2中的步骤2）中向NF服务消费者发送订阅ID，该订阅ID应包括以下结构：<MCC> <MNC> “ - ”<OriginalSubscriptionID>
+EXAMPLE:	If the NRF in a Home PLMN (where MCC = 123, and MNC=456) creates a subscription with value "subs987654", the subscriptionID that the NRF in Serving PLMN would send to the NF Service Consumer in Serving PLMN is: "123456-subs987654"
+
+示例：如果归属PLMN中的NRF（其中MCC = 123，并且MNC = 456）创建具有值“subs987654”的订阅，则服务PLMN中的NRF将在服务PLMN中发送给NF服务消费者的订阅ID是：“ 123456-subs987654"
+2b.	If the creation of the subscription fails at the NRF due to errors in the SubscriptionData JSON object in the request body, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果由于请求正文中的SubscriptionData JSON对象中的错误而导致订阅的创建在NRF处失败，则NRF将返回“400 Bad Request”状态代码，其中ProblemDetails IE提供错误的详细信息。
+If the creation of the subscription fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误而在NRF上创建订阅失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.5.4	Subscription to NF Instances with intermediate forwarding NRF
+
+5.2.2.5.4使用中间转发NRF订阅NF实例
+When multiple NRFs are deployed in one PLMN, an NF Instance can subscribe to changes of NF Instances registered in an NRF to which it is not directly interacting. The subscription message is forwarded by an intermediate NRF to which the subscribing NF instance is directly interacting. 
+
+当在一个PLMN中部署多个NRF时，NF实例可以订阅在其未直接交互的NRF中注册的NF实例的变化。订阅消息由订阅NF实例直接与之交互的中间NRF转发。
+For that, step 1 in subclause 5.2.2.5.2 is executed (send a POST request to the NRF-1 in the Serving PLMN); this request shall include the SubscriptionData parameter in the request body.
+
+为此，执行子条款5.2.2.5.2中的步骤1（向服务PLMN中的NRF-1发送POST请求）;此请求应在请求正文中包含SubscriptionData参数。
+Then, steps 1-4 in Figure 5.2.2.5.4-1 are executed between NF Service Consumer in Serving PLMN, NRF-1 in Serving PLMN and NRF-2 in Serving PLMN. In thest steps, NRF-1 sends the subscription request to a pre-configured NRF-2. NRF-2 requests corresponding NRF (e.g. the NF Service Producer registered NRF) and returns a subscriptionID identifying the created subscription and this subscriptionID is sent to the NF Service Consumer via NRF-1.
+
+然后，在服务PLMN中的NF服务消费者，服务PLMN中的NRF-1和服务PLMN中的NRF-2之间执行图5.2.2.5.4-1中的步骤1-4。在第一步中，NRF-1将订阅请求发送到预先配置的NRF-2。 NRF-2请求相应的NRF（例如，NF服务生产者注册的NRF）并返回标识所创建的订阅的订阅ID，并且该订阅ID通过NRF-1发送给NF服务消费者。
+Finally, step 2 in subclause 5.2.2.5.2 is executed; the subscriptionID shall be sent to the NF Service Consumer.
+
+最后，执行子条款5.2.2.5.2中的步骤2; subscriptionID应发送给NF服务消费者。
+
+
+Figure 5.2.2.5.4-1: Subscription with intermediate forwarding NRF
+
+图5.2.2.5.4-1：使用中间转发NRF的订阅
+1.	NRF-1 receives a subscription request but does not have the information to fulfil the request. Then NRF-1 sends the subscription request to a pre-configured NRF-2.
+
+1. NRF-1收到订阅请求，但没有完成请求的信息。然后，NRF-1将订阅请求发送到预先配置的NRF-2。
+2.	Upon receiving a subscription request, based on the SubscriptionData contained in the subscription request (e.g.NF type) and locally stored information (see subclause 5.2.2.2.3), NRF-2 shall identify the next hop NRF and forward the subscription request to that NRF (i.e. NF Service Producer registered NRF).
+
+2.在接收到订阅请求时，基于订阅请求中包含的SubscriptionData（例如，NF类型）和本地存储的信息（参见子条款5.2.2.2.3），NRF-2应识别下一跳NRF并转发订阅请求到那个NRF（即NF服务生产者注册的NRF）。
+3a.	On success, "201 Created" shall be returned by NRF-2.
+
+3A。成功后，NRF-2将归还“201 Created”。
+3b.	If the creation of the subscription fails, the NRF-2 shall return "4XX/5XX" response.
+
+3B。如果订阅的创建失败，NRF-2将返回“4XX / 5XX”响应。
+4a.	NRF-1 forwards the success response to NF Service Consumer. The payload body of the POST response shall contain the representation describing the status of the request and the "Location" header shall be present and shall contain the URI of the created resource. The authority and/or deployment-specific string of the apiRoot of the created resource URI may differ from the authority and/or deployment-specific string of the apiRoot of the request URI received in the POST request.
+
+4A。 NRF-1将成功响应转发给NF服务消费者。 POST响应的有效载荷主体应包含描述请求状态的表示，并且“Location”头应存在，并应包含所创建资源的URI。创建的资源URI的apiRoot的授权和/或特定于部署的字符串可以与POST请求中接收的请求URI的apiRoot的授权和/或特定于部署的字符串不同。
+4b.	NRF-1 forwards the error response to NF Service Consumer.
+
+4B。 NRF-1将错误响应转发给NF服务消费者。
+5.2.2.5.5	Subscription to NF Instances with intermediate redirecting NRF
+
+5.2.2.5.5使用中间重定向NRF的NF实例的订阅
+When multiple NRFs are deployed in one PLMN, an NF Instance can subscribe to changes of NF Instances registered in another NRF. The subscription message is redirected by a third NRF. 
+
+当在一个PLMN中部署多个NRF时，NF实例可以订阅在另一个NRF中注册的NF实例的变化。订阅消息由第三NRF重定向。
+For that, step 1 in subclause 5.2.2.5.2 is executed (send a POST request to the NRF-1 in the Serving PLMN); this request shall include the SubscriptionData parameter in the request body.
+
+为此，执行子条款5.2.2.5.2中的步骤1（向服务PLMN中的NRF-1发送POST请求）;此请求应在请求正文中包含SubscriptionData参数。
+Then, steps 2-5 in Figure 5.2.2.5.5-1 are executed between NRF-1, NRF-2 and NRF-3. 
+
+然后，在NRF-1，NRF-2和NRF-3之间执行图5.2.2.5.5-1中的步骤2-5。
+Finally, step 2 in subclause 5.2.2.5.2 is executed; the subscriptionID shall be sent to the NF Service Consumer.
+
+最后，执行子条款5.2.2.5.2中的步骤2; subscriptionID应发送给NF服务消费者。
+
+Figure 5.2.2.5.5-1: Subscription to NF Instances with intermediate redirecting NRF
+
+图5.2.2.5.5-1：使用中间重定向NRF订阅NF实例
+1.	NF Service Consumer send a subscription request to NRF-1.
+
+1. NF服务消费者向NRF-1发送订阅请求。
+2.	NRF-1 receives a subscription request but does not have the information to fulfil the request. Then NRF-1 sends the subscription request to a pre-configured NRF-2.
+
+2. NRF-1收到订阅请求，但没有满足请求的信息。然后，NRF-1将订阅请求发送到预先配置的NRF-2。
+3.	Upon receiving a subscription request, based on the SubscriptionData contained in the subscription request (e.g.NF type) and locally stored information (see subclause 5.2.2.2.3), NRF-2 shall identify the next hop NRF, and redirect the subscription request by returning HTTP 307 Temporary Redirect response. 
+
+3.在接收到订阅请求时，基于订阅请求中包含的SubscriptionData（例如，NF类型）和本地存储的信息（参见子条款5.2.2.2.3），NRF-2应识别下一跳NRF，并重定向订阅请求通过返回HTTP 307临时重定向响应。
+	The 307 Temporary Redirect response shall contain a Location header field, the host part of the URI in the Location header field represents NRF-3.
+
+307临时重定向响应应包含Location头字段，Location头字段中URI的主机部分表示NRF-3。
+4.	Upon receiving 307 Temporary Redirect response, NRF-1 sends the subscription request to NRF-3 by using the URI contained in the Location header field of the 307 Temporary Redirect response.
+
+4.在收到307临时重定向响应后，NRF-1使用307临时重定向响应的Location头字段中包含的URI将订阅请求发送到NRF-3。
+5a.	On success, "201 Created" shall be returned by NRF-3.
+
+5A。成功后，NRF-3将归还“201 Created”。
+5b.	If the creation of the subscription fails at the NRF-3, the NRF-3 shall return "4XX/5XX" response.
+
+5B。如果在NRF-3上创建订阅失败，则NRF-3应返回“4XX / 5XX”响应。
+6a.	On success, "201 Created" shall be forwarded to NF Service Consumer via NRF-1. The payload body of the POST response shall contain the representation describing the status of the request and the "Location" header shall be present and shall contain the URI of the created resource. The authority and/or deployment-specific string of the apiRoot of the created resource URI may differ from the authority and/or deployment-specific string of the apiRoot of the request URI received in the POST request.
+
+6A。成功后，“201 Created”将通过NRF-1转发给NF服务消费者。 POST响应的有效载荷主体应包含描述请求状态的表示，并且“Location”头应存在，并应包含所创建资源的URI。创建的资源URI的apiRoot的授权和/或特定于部署的字符串可以与POST请求中接收的请求URI的apiRoot的授权和/或特定于部署的字符串不同。
+6b.	If the creation of the subscription fails, "4XX/5XX" shall be forwarded to NF Service Consumer via NRF-1.
+
+6B。如果订阅的创建失败，则“4XX / 5XX”将通过NRF-1转发给NF服务消费者。
+5.2.2.5.6	Update of Subscription to NF Instances
+
+5.2.2.5.6更新NF实例的订阅
+The subscription to notifications on NF Instances may be updated to refresh the validity time, when this time is about to expire. The NF Service Consumer may request a new validity time to the NRF, and the NRF shall answer with the new assigned validity time, if the operation is successful.
+
+当这个时间即将到期时，可以更新对NF实例的通知的订阅以刷新有效时间。 NF服务消费者可以向NRF请求新的有效时间，并且如果操作成功，则NRF将以新分配的有效时间应答。
+This operation is executed by updating the resource identified by "subscriptionID". It is invoked by issuing an HTTP PATCH request on the URI representing the individual resource.
+
+通过更新由“subscriptionID”标识的资源来执行该操作。通过在表示单个资源的URI上发出HTTP PATCH请求来调用它。
+
+Figure 5.2.2.5.6-1: Subscription to NF Instances in the same PLMN
+
+图5.2.2.5.6-1：同一PLMN中对NF实例的订阅
+1.	The NF Service Consumer shall send a PATCH request to the resource URI identifying the individual subscription resource. The payload body of the PATCH request shall contain a "replace" operation on the "validityTime" attribute of the SubscriptionData structure and shall contain a new suggested value for it; no other attribute of the resource shall be updated as part of this operation.
+
+1. NF服务消费者应向标识个人订阅资源的资源URI发送PATCH请求。 PATCH请求的有效负载主体应包含对SubscriptionData结构的“validityTime”属性的“替换”操作，并应包含新的建议值;作为此操作的一部分，不得更新资源的其他属性。
+2a.	On success, if the NRF accepts the extension of the lifetime of the subscription, and it accepts the requested value for the "validityTime" attribute, a response with status code "204 No Content" shall be returned.
+
+2A。成功时，如果NRF接受订阅生命周期的延长，并且它接受“validityTime”属性的请求值，则应返回状态代码为“204 No Content”的响应。
+2b.	On success, if the NRF accepts the extension of the lifetime of the subscription, but it assigns a validity time different than the value suggested by the NF Service Consumer, a "200 OK" response code shall be returned. The response shall contain the new resource representation of the "subscription" resource, which includes the new validity time, as determined by the NRF, after which the subscription becomes invalid.
+
+2B。成功时，如果NRF接受订阅生命周期的延长，但它指定的有效时间不同于NF服务消费者建议的值，则应返回“200 OK”响应代码。响应应包含“订阅”资源的新资源表示，其包括由NRF确定的新有效时间，之后订阅变为无效。
+2c.	If the update of the subscription fails at the NRF due to errors in the JSON Patch object in the request body, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+2C。如果订阅的更新由于请求正文中的JSON补丁对象中的错误而在NRF处失败，则NRF将返回“400 Bad Request”状态代码，ProblemDetails IE提供错误的详细信息。
+If the update of the subscription fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误导致订阅更新在NRF失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+EXAMPLE:
+PATCH .../subscriptions/2a58bf47
+
+PATCH ... / subscriptions / 2a58bf47
+Content-Type: application/json-patch+json
+
+Content-Type：application / json-patch json
+
+[
+  { "op": "replace", "path": "/validityTime", "value": "2018-12-30T23:20:50Z" },
+
+  {“op”：“replace”，“path”：“/ validityTime”，“value”：“2018-12-30T23：20：50Z”}，
+]
+
+
+HTTP/2 204 No Content
+
+HTTP / 2 204无内容
+
+5.2.2.6	NFStatusNotify
+
+5.2.2.6 NFStatusNotify
+5.2.2.6.1	General
+This service operation notifies each NF Service Consumer that was previously subscribed to receiving notifications of registration/deregistration of NF Instances, or notifications of changes of the NF profile of a given NF Instance. The notification is sent to a callback URI that each NF Service Consumer provided during the subscription (see NFStatusSubscribe operation in 5.2.2.5).
+
+该服务操作通知每个NF服务消费者，该消费者先前订阅了接收NF实例的注册/注销通知，或者给定NF实例的NF配置文件的变化通知。通知将发送到每个NF服务使用者在订阅期间提供的回调URI（请参阅5.2.2.5中的NFStatusSubscribe操作）。
+5.2.2.6.2	Notification from NRF in the same PLMN
+
+5.2.2.6.2 NRF在同一PLMN中的通知
+The operation is invoked by issuing a POST request to each callback URI of the different subscribed NF Instances.
+
+通过向不同订阅的NF实例的每个回调URI发出POST请求来调用该操作。
+
+Figure 5.2.2.6.2-1: Notification from NRF in the same PLMN
+
+图5.2.2.6.2-1：同一PLMN中NRF的通知
+1.	The NRF shall send a POST request to the callback URI. 
+
+1. NRF应向回调URI发送POST请求。
+For notifications of newly registered NF Instances, the request body shall include the data associated to the newly registered NF, and its services, according to the criteria indicated by the NF Service Consumer during the subscription operation. These data shall contain the NFInstanceID of the NF Instance, an indication of the event being notified ("registration"), and the new profile data (including, among others, the services offered by the NF Instance).
+
+对于新注册的NF实例的通知，请求主体应根据NF服务消费者在订阅操作期间指示的标准，包括与新注册的NF及其服务相关联的数据。这些数据应包含NF实例的NFInstanceID，被通知事件的指示（“注册”），以及新的配置文件数据（包括NF实例提供的服务等）。
+For notifications of changes of the profile of a NF Instance, the request body shall include the NFInstancceID of the NF Instance whose profile was changed, an indication of the event being notified ("profile change"), and the new profile data.
+
+对于NF实例的配置文件的更改通知，请求主体应包括其配置文件已更改的NF实例的NFInstancceID，通知事件的指示（“配置文件更改”）以及新配置文件数据。
+For notifications of deregistration of the NF Instance from NRF, the request body shall include the NFInstanceID of the deregistered NF Instance, and an indication of the event being notified ("deregistration"). 
+
+对于从NRF撤销注册NF实例的通知，请求主体应包括注销的NF实例的NFInstanceID，以及通知事件的指示（“注销”）。
+When an NF Service Consumer subscribes to a set of NFs (using the different subscription conditions specified in subclause 6.1.6.2.35), a change in the profile of the monitored NF Instance may result in such NF becoming a part of the NF set (e.g., an NF Service Consumer subscribing to all NFs offering a given NF Service, and then, a certain NF Instance changes its profile by adding a new NF Service to its NF Profile); in such case, the NRF shall use the "profile change" event type in the notification.
+
+当NF服务消费者订阅一组NF时（使用6.1.6.2.35中规定的不同订阅条件），受监视的NF实例的配置文件的更改可能导致此类NF成为NF集的一部分（例如，NF服务消费者订阅提供给定NF服务的所有NF，然后，某个NF实例通过向其NF配置文件添加新的NF服务来改变其配置文件）;在这种情况下，NRF应在通知中使用“配置文件更改”事件类型。
+2a.	On success, "204 No content" shall be returned by the NF Service Consumer.
+
+2A。成功后，NF服务消费者将退回“204 No content”。
+2b.	If the NF Service Consumer does not consider the "nfStatusNotificationURI" as a valid notification URI (e.g., because the URI does not belong to any of the existing subscriptions created by the NF Service Consumer in the NRF), the NF Service Consumer shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果NF服务消费者不将“nfStatusNotificationURI”视为有效通知URI（例如，因为URI不属于NRF中NF服务消费者创建的任何现有订阅），则NF服务消费者应返回“ “404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.6.3	Notification from NRF in a different PLMN
+
+5.2.2.6.3 NRF在不同PLMN中的通知
+The operation is invoked by issuing a POST request to each callback URI of the different subscribed NF Instances.
+
+通过向不同订阅的NF实例的每个回调URI发出POST请求来调用该操作。
+
+
+Figure 5.2.2.6.3-1: Notification from NRF in a different PLMN
+
+图5.2.2.6.3-1：来自不同PLMN的NRF的通知
+Steps 1 and 2 are identical to steps 1 and 2 in Figure 5.2.2.6.2-1.
+
+步骤1和2与图5.2.2.6.2-1中的步骤1和2相同。
+It should be noted that the POST request shall be sent directly from the NRF in Home PLMN to the NF Service Consumer in Serving PLMN, without involvement of the NRF in Serving PLMN.
+
+应当注意，POST请求应该直接从归属PLMN中的NRF发送到服务PLMN中的NF服务消费者，而不涉及NRF在服务PLMN中。
+5.2.2.6.4	Notification for subscription via intermediate NRF
+
+5.2.2.6.4通过中间NRF订阅的通知
+
+Figure 5.2.2.6.4-1: Notification for subscription via intermediate NRF
+
+图5.2.2.6.4-1：通过中间NRF订阅的通知
+Step 0 is the NF Service Consumer creates a subscription to NRF-2 via intermediate NRF.
+
+步骤0是NF服务消费者通过中间NRF创建对NRF-2的订阅。
+Steps 1 and 2 are identical to steps 1 and 2 in Figure 5.2.2.6.2-1.
+
+步骤1和2与图5.2.2.6.2-1中的步骤1和2相同。
+The POST request shall be sent directly from NRF-2 to the NF Service Consumer without involvement of NRF-1.
+
+POST请求应直接从NRF-2发送给NF服务消费者，而不涉及NRF-1。
+5.2.2.7	NFStatusUnSubscribe
+
+5.2.2.7 NFStatusUnSubscribe
+5.2.2.7.1	General
+This service operation removes an existing subscription to notifications.
+
+此服务操作会删除现有的通知订阅。
+5.2.2.7.2	Subscription removal in the same PLMN
+
+5.2.2.7.2在同一PLMN中删除订阅
+It is executed by deleting a given resource identified by a "subscriptionID". The operation is invoked by issuing a DELETE request on the URI representing the specific subscription.
+
+它通过删除由“subscriptionID”标识的给定资源来执行。通过在表示特定订阅的URI上发出DELETE请求来调用该操作。
+
+Figure 5.2.2.7.2-1: Subscription removal in the same PLMN
+
+图5.2.2.7.2-1：同一PLMN中的订阅删除
+1.	The NF Service Consumer shall send a DELETE request to the resource URI representing the individual subscription. The request body shall be empty.
+
+1. NF服务消费者应该向表示个人订阅的资源URI发送DELETE请求。请求正文应为空。
+2a.	On success, "204 No Content" shall be returned. The response body shall be empty.
+
+2A。成功时，将退回“204 No Content”。响应主体应为空。
+2b.	If the subscription, identified by the "subscriptionID", is not found in the list of active subscriptions in the NRF's database, the NRF shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果在NRF数据库的活动订阅列表中找不到由“subscriptionID”标识的订阅，则NRF将返回“404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+5.2.2.7.3	Subscription removal in a different PLMN
+
+5.2.2.7.3在不同的PLMN中删除订阅
+The subscription removal in a different PLMN is done by deleting a resource identified by a "subscriptionID", in the NRF of the Home PLMN.
+
+通过在归属PLMN的NRF中删除由“subscriptionID”标识的资源来完成不同PLMN中的订阅移除。
+For that, step 1 in subclause 5.2.2.7.2 is executed (send a DELETE request to the NRF in the Serving PLMN); this request shall include the identity of the PLMN of the home NRF (MCC/MNC values) as a leading prefix of the susbcriptionID (see subclause 5.2.2.5.3).
+
+为此，执行子条款5.2.2.7.2中的步骤1（向服务PLMN中的NRF发送DELETE请求）;该请求应包括归属NRF（MCC / MNC值）的PLMN的标识作为susbcriptionID的前导前缀（参见子条款5.2.2.5.3）。
+Then, steps 1-2 in Figure 5.2.2.7.3-1 are executed, between the NRF in the Serving PLMN and the NRF in the Home PLMN. In this step, the subscriptionID sent to the NRF in the Home PLMN shall not contain the identity of the PLMN (i.e., it shall be the same subscriptionID value as originally generated by the NRF in the Home PLMN). The NRF in the Home PLMN returns a status code with the result of the operation.
+
+然后，在服务PLMN中的NRF和归属PLMN中的NRF之间执行图5.2.2.7.3-1中的步骤1-2。在该步骤中，发送到归属PLMN中的NRF的订阅ID不应包含PLMN的标识（即，它应该是与归属PLMN中的NRF最初生成的订阅ID值相同）。归属PLMN中的NRF返回具有操作结果的状态代码。
+Finally, step 2 in subclause 5.2.2.7.2 is executed; a status code is returned to the NF Service Consumer in Serving PLMN in accordance to the result received from NRF in Home PLMN.
+
+最后，执行子条款5.2.2.7.2中的步骤2;根据从归属PLMN中的NRF接收的结果，将状态代码返回到服务PLMN中的NF服务消费者。
+
+
+Figure 5.2.2.7.3-1: Subscription removal in a different PLMN
+
+图5.2.2.7.3-1：不同PLMN中的订阅删除
+1.	The NF Service Consumer shall send a DELETE request to the resource URI representing the individual subscription. The request body shall be empty.
+
+1. NF服务消费者应该向表示个人订阅的资源URI发送DELETE请求。请求正文应为空。
+2a.	On success, "204 No Content" shall be returned. The response body shall be empty.
+
+2A。成功时，将退回“204 No Content”。响应主体应为空。
+2b.	If the subscription, identified by the "subscriptionID", is not found in the list of active subscriptions in the NRF's database, the NRF shall return "404 Not Found" status code with the ProblemDetails IE providing details of the error.
+
+2B。如果在NRF数据库的活动订阅列表中找不到由“subscriptionID”标识的订阅，则NRF将返回“404 Not Found”状态代码，ProblemDetails IE提供错误的详细信息。
+
+
+ Nnrf_NFDiscovery服务
+5.3.1	Service Description
+
+5.3.1服务描述
+The Nnrf_NFDiscovery service allows a Network Function Instance to discover services offered by other Network Function Instances, by querying the local NRF.
+
+Nnrf_NFDiscovery服务允许网络功能实例通过查询本地NRF来发现其他网络功能实例提供的服务。
+It also allows an NRF in a PLMN to re-issue a discovery request towards an NRF in another PLMN (e.g., the HPLMN of a certain UE).
+
+它还允许PLMN中的NRF向另一个PLMN（例如，某个UE的HPLMN）中的NRF重新发出发现请求。
+5.3.2	Service Operations
+
+5.3.2服务运营
+5.3.2.1	Introduction
+
+5.3.2.1简介
+The service operations defined for the Nnrf_NFDiscovery service are as follows:
+
+为Nnrf_NFDiscovery服务定义的服务操作如下：
+-	NFDiscover: It provides to the NF service consumer the IP address(es) or FQDN of the NF Instance(s) or NF Service(s) matching certain input criteria.
+
+ -  NFDiscover：它向NF服务消费者提供符合某些输入标准的NF实例或NF服务的IP地址或FQDN。
+The NFDiscover operation can be invoked by an NF Service Consumer (i.e., "source NF") requesting to discover NF instances (i.e., "target NFs") located in the same PLMN, or in a different PLMN.
+
+NF服务消费者（即，“源NF”）可以调用NFDiscover操作，该NF服务消费者请求发现位于同一PLMN或不同PLMN中的NF实例（即，“目标NF”）。
+In the description of these operations in subclause 5.3.2.2, when the NF instances are located in the same PLMN, both source NF and target NFs are said to be located in the "Serving PLMN" but, in the general case, the functionality is not restricted to the PLMN that is serving a given UE, and it shall be applicable as well to any scenario in which source NF and target NFs belong to the same PLMN.
+
+在子条款5.3.2.2中对这些操作的描述中，当NF实例位于同一PLMN中时，源NF和目标NF都被称为位于“服务PLMN”中，但在一般情况下，功能是不限于为给定UE服务的PLMN，并且它也适用于源NF和目标NF属于同一PLMN的任何场景。
+When source NF and target NFs are located in different PLMNs, the source NF is said to be in the "Serving PLMN", and the target NFs (and the NRF where they are registered) are said to be in the "Home PLMN", similarly to the scenarios described in 3GPP TS 23.502 [2], but the functionality shall be equally applicable to any scenario between any pair of PLMNs (e.g. with the source NF in the Home PLMN and the target NF in the Serving PLMN).
+
+当源NF和目标NF位于不同的PLMN中时，源NF被称为在“服务PLMN”中，并且目标NF（以及它们被注册的NRF）被称为在“归属PLMN”中，类似于3GPP TS 23.502 [2]中描述的场景，但是该功能应同样适用于任何PLMN对之间的任何场景（例如，具有归属PLMN中的源NF和服务PLMN中的目标NF）。
+5.3.2.2	NFDiscover
+5.3.2.2.1	General
+This service operation discovers the set of NF Instances (and their associated NF Service Instances), represented by their NF Profile, that are currently registered in NRF and satisfy a number of input query parameters.
+
+此服务操作发现当前在NRF中注册并满足多个输入查询参数的NF实例集（及其关联的NF服务实例），由其NF配置文件表示。
+Before a service consumer invokes this service operation, it shall consider if it is possible to reuse the results from a previous searching (service discovery). 
+
+在服务使用者调用此服务操作之前，它应考虑是否可以重用先前搜索（服务发现）的结果。
+The service consumer should reuse the previous result if input query parameters in the new service discovery request are the same as used for the previous search and the validity period of the result is not expired.
+
+如果新服务发现请求中的输入查询参数与先前搜索所使用的相同，并且结果的有效期未过期，则服务使用者应重用先前的结果。
+The service consumer may consider reusing the previous result if the attributes as required for the new query is also part of NF profile of the candidates NFs from a previous query. In such case, when the results of a previous query are reused, the service consumer need consider that the results, e.g. in terms of the number of discovered NFs, can be different than the potential results obtained after performing a new query.
+
+如果新查询所需的属性也是来自先前查询的候选NF的NF概况的一部分，则服务消费者可以考虑重用先前的结果。在这种情况下，当重新使用先前查询的结果时，服务消费者需要考虑结果，例如，就发现的NF的数量而言，可以与执行新查询后获得的潜在结果不同。
+5.3.2.2.2	Service Discovery in the same PLMN
+
+5.3.2.2.2同一PLMN中的服务发现
+This service operation is executed by querying the "nf-instances" resource. The request is sent to an NRF in the same PLMN of the NF Service Consumer.
+
+通过查询“nf-instances”资源来执行该服务操作。该请求被发送到NF服务消费者的同一PLMN中的NRF。
+
+Figure 5.3.2.2.2-1: Service Discovery Request in the same PLMN
+
+图5.3.2.2.2-1：同一PLMN中的服务发现请求
+1.	The NF Service Consumer shall send an HTTP GET request to the resource URI "nf-instances" collection resource. The input filter criteria for the discovery request shall be included in query parameters.
+
+1. NF服务消费者应该向资源URI“nf-instances”集合资源发送HTTP GET请求。发现请求的输入过滤条件应包含在查询参数中。
+2a.	On success, "200 OK" shall be returned. The response body shall contain a validity period, during which the search result can be cached by the NF Service Consumer, and an array of NF profile objects, that satisfy the search filter criteria (e.g., all NF Instances offering a certain NF Service name). 
+
+2A。成功时，将返回“200 OK”。响应正文应包含一个有效期，在此期间，NF服务消费者可以缓存搜索结果，并且满足搜索过滤条件的NF配置文件对象数组（例如，提供特定NF服务名称的所有NF实例） 。
+2b.	If the NF Service Consumer is not allowed to discover the NF services for the requested NF type provided in the query parameters, the NRF shall return "403 Forbidden" response.
+
+2B。如果不允许NF服务消费者发现查询参数中提供的请求的NF类型的NF服务，则NRF应返回“403 Forbidden”响应。
+If the discovery request fails at the NRF due to errors in the input data in the URI query parameters, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+如果由于URI查询参数中的输入数据中的错误而在NRF处发现请求失败，则NRF将返回“400 Bad Request”状态代码，其中ProblemDetails IE提供错误的细节。
+If the discovery request fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误而在NRF上发现请求失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+The NF profile objects returned in a successful result shall contain generic data of each NF instance, applicable to any NF type, and it may also contain NF-specific data, for those NF instances belonging to a specific type (e.g., the attribute "udrInfo" is typically present in the NF profile when the type of the NF instance takes the value "UDR"). In addition, the attribute "customInfo", may be present in the NF profile for those NF instances with custom NF types.
+
+成功结果中返回的NF配置文件对象应包含适用于任何NF类型的每个NF实例的通用数据，并且还可以包含属于特定类型的NF实例的NF特定数据（例如，属性“udrInfo”）当NF实例的类型取值“UDR”时，“通常存在于NF配置文件中”。此外，属性“customInfo”可能存在于具有自定义NF类型的那些NF实例的NF配置文件中。
+For those NF instances, the "customInfo" attribute shall be returned by NRF, if available, as part of the NF profiles returned in the discovery response. 
+
+对于那些NF实例，NRF返回“customInfo”属性（如果可用），作为发现响应中返回的NF配置文件的一部分。
+5.3.2.2.3	Service Discovery in a different PLMN
+
+5.3.2.2.3不同PLMN中的服务发现
+The service discovery in a different PLMN is done by querying the "nf-instances" resource in the NRF of the Home PLMN.
+
+通过查询归属PLMN的NRF中的“nf-instances”资源来完成不同PLMN中的服务发现。
+For that, step 1 in subclause 5.3.2.2.2 is executed (send a GET request to the NRF in the Serving PLMN); this request shall include the identity of the PLMN of the home NRF in a query parameter of the URI.
+
+为此，执行子条款5.3.2.2.2中的步骤1（向服务PLMN中的NRF发送GET请求）;该请求应包括URI的查询参数中的归属NRF的PLMN的标识。
+Then, steps 1-2 in Figure 5.3.2.2.3-1 are executed, between the NRF in the Serving PLMN and the NRF in the Home PLMN. In this step, the presence of the PLMN ID of the Home NRF in the query parameter of the URI is not required. The NRF in the Home PLMN returns a status code with the result of the operation. The NRF in the Serving PLMN shall be configured with a telescopic FQDN (see 3GPP TS 23.003 [12] and 3GPP TS 29.500 [4]) of the NRF in the Home PLMN. 
+
+然后，在服务PLMN中的NRF和归属PLMN中的NRF之间执行图5.3.2.2.3-1中的步骤1-2。在该步骤中，不需要在URI的查询参数中存在Home NRF的PLMN ID。归属PLMN中的NRF返回具有操作结果的状态代码。服务PLMN中的NRF应配置有归属PLMN中的NRF的望远镜FQDN（参见3GPP TS 23.003 [12]和3GPP TS 29.500 [4]）。
+NOTE:	This is required for the NRF in the serving PLMN to route the NF discovery request to the NRF in the HPLMN through a SEPP in the serving PLMN and the SEPP to terminate the TLS connection with a wildcard certificate.
+
+注意：这是服务PLMN中的NRF通过服务PLMN中的SEPP和SEPP将NF发现请求路由到HPLMN中的NRF以终止具有通配符证书的TLS连接所必需的。
+Finally, step 2 in subclause 5.3.2.2.2 is executed; a status code is returned to the NF Service Consumer in Serving PLMN in accordance to the result received from NRF in Home PLMN.
+
+最后，执行子条款5.3.2.2.2中的步骤2;根据从归属PLMN中的NRF接收的结果，将状态代码返回到服务PLMN中的NF服务消费者。
+
+
+Figure 5.3.2.2.3-1: Service Discovery in a different PLMN
+
+图5.3.2.2.3-1：不同PLMN中的服务发现
+Steps 1 and 2 are similar to steps 1 and 2 in Figure 5.3.2.2.2-1, by replacing the originator of the service invocation with the NRF in Serving PLMN, and the recipient of the service invocation with the NRF in the Home PLMN.
+
+步骤1和2类似于图5.3.2.2.2-1中的步骤1和2，通过用服务PLMN中的NRF替换服务调用的发起者，以及在归属PLMN中用NRF替换服务调用的接收者。
+5.3.2.2.4	Service Discovery with intermediate redirecting NRF
+
+5.3.2.2.4使用中间重定向NRF的服务发现
+When multiple NRFs are deployed in one PLMN, one NRF may query the "nf-instances" resource in a different NRF so as to fulfil the service discovery request from a NF service consumer. The query between these two NRFs is redirected by a third NRF.
+
+当在一个PLMN中部署多个NRF时，一个NRF可以查询不同NRF中的“nf-instances”资源，以便实现来自NF服务消费者的服务发现请求。这两个NRF之间的查询由第三个NRF重定向。
+
+Figure 5.3.2.2.4-1: Service Discovery with intermediate redirecting NRF
+
+图5.3.2.2.4-1：使用中间重定向NRF的服务发现
+1.	NRF-1 receives a service discovery request but does not have the information to fulfil the request. Then NRF-1 sends the service discovery request to a pre-configured NRF-2.
+
+1. NRF-1接收服务发现请求，但没有满足请求的信息。然后，NRF-1将服务发现请求发送到预先配置的NRF-2。
+2a.	Upon receiving a service discovery request, based on the information contained in the service discovery request (e.g. the "supi" query parameter in the URI) and locally stored information NRF-2 shall identify the next hop NRF (see subclause 5.2.2.2.3), and redirect the service discovery request by returning HTTP 307 Temporary Redirect response. The locally stored information in NRF-2 may:
+
+2A。在接收到服务发现请求时，基于服务发现请求中包含的信息（例如，URI中的“supi”查询参数）和本地存储的信息，NRF-2将识别下一跳NRF（参见子条款5.2.2.2.3）。 ），并通过返回HTTP 307临时重定向响应重定向服务发现请求。 NRF-2中本地存储的信息可以：
+a)	be preconfigured; or
+
+a）预先配置;要么
+b)	registered by other NRFs (see subclause 5.2.2.2.3).
+
+b）由其他NRF注册（见5.2.2.2.3）。
+	The 307 Temporary Redirect response shall contain a Location header field, the host part of the URI in the Location header field represents NRF-3.
+
+307临时重定向响应应包含Location头字段，Location头字段中URI的主机部分表示NRF-3。
+2b.	if NRF-2 does not have enough information to redirect the service discovery request, then it responds with 404 Not Found, and the rest of the steps are omitted.
+
+2B。如果NRF-2没有足够的信息来重定向服务发现请求，则它以404 Not Found响应，其余步骤被省略。
+3.	Upon receiving 307 Temporary Redirect response, NRF-1 sends the service discovery request to NRF-3 by using the URI contained in the Location header field of the 307 Temporary Redirect response.
+
+3.在收到307临时重定向响应后，NRF-1通过使用307临时重定向响应的Location头字段中包含的URI将服务发现请求发送到NRF-3。
+4a.	Upon success, NRF-3 returns the search result.
+
+4A。成功后，NRF-3返回搜索结果。
+4b.	If the NF Service Consumer is not allowed to discover the NF services for the requested NF type provided in the query parameters, the NRF shall return "403 Forbidden" response.
+
+4B。如果不允许NF服务消费者发现查询参数中提供的请求的NF类型的NF服务，则NRF应返回“403 Forbidden”响应。
+If the discovery request fails at the NRF due to errors in the input data in the URI query parameters, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+如果由于URI查询参数中的输入数据中的错误而在NRF处发现请求失败，则NRF将返回“400 Bad Request”状态代码，其中ProblemDetails IE提供错误的细节。
+If the discovery request fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误而在NRF上发现请求失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+5.3.2.2.5	Service Discovery with intermediate forwarding NRF
+
+5.3.2.2.5具有中间转发NRF的服务发现
+When multiple NRFs are deployed in one PLMN, one NRF may query the "nf-instances" resource in a different NRF so as to fulfil the service discovery request from a NF service consumer. The query between these two NRFs is forwarded by a third NRF.
+
+当在一个PLMN中部署多个NRF时，一个NRF可以查询不同NRF中的“nf-instances”资源，以便实现来自NF服务消费者的服务发现请求。这两个NRF之间的查询由第三个NRF转发。
+
+Figure 5.3.2.2.5-1: Service Discovery with intermediate forwarding NRF
+
+图5.3.2.2.5-1：具有中间转发NRF的服务发现
+1.	NRF-1 receives a service discovery request but does not have the information to fulfil the request. Then NRF-1 sends the service discovery request to a pre-configured NRF-2.
+
+1. NRF-1接收服务发现请求，但没有满足请求的信息。然后，NRF-1将服务发现请求发送到预先配置的NRF-2。
+2a.	Upon receiving a service discovery request, based on the information contained in the service discovery request (e.g. the "supi" query parameter in the URI) and locally stored information, NRF-2 shall identify the next hop NRF (see subclause 5.2.2.2.3), and forward the service discovery request to that NRF (i.e. NRF-3 in this example), by replacing the originator of the service invocation with NRF-2, and the recipient of the service invocation with NRF-3. The locally stored information in NRF-2 may:
+
+2A。在接收到服务发现请求时，基于服务发现请求中包含的信息（例如，URI中的“supi”查询参数）和本地存储的信息，NRF-2将识别下一跳NRF（参见子条款5.2.2.2。 3），并通过用NRF-2替换服务调用的发起者，以及用NRF-3替换服务调用的接收者，将服务发现请求转发到该NRF（即本例中的NRF-3）。 NRF-2中本地存储的信息可以：
+a)	be preconfigured; or
+
+a）预先配置;要么
+b)	registered by other NRFs (see subclause 5.2.2.2.3). 
+
+b）由其他NRF注册（见5.2.2.2.3）。
+2b.	if NRF-2 does not have enough information to forward the service discovery request, then it responds with 404 Not Found, and the rest of the steps are omitted.
+
+2B。如果NRF-2没有足够的信息来转发服务发现请求，则它以404 Not Found响应，其余步骤被省略。
+3a.	Upon success, NRF-3 returns the search result.
+
+3A。成功后，NRF-3返回搜索结果。
+3b.	If the NF Service Consumer is not allowed to discover the NF services for the requested NF type provided in the query parameters, the NRF shall return "403 Forbidden" response.
+
+3B。如果不允许NF服务消费者发现查询参数中提供的请求的NF类型的NF服务，则NRF应返回“403 Forbidden”响应。
+If the discovery request fails at the NRF due to errors in the input data in the URI query parameters, the NRF shall return "400 Bad Request" status code with the ProblemDetails IE providing details of the error.
+
+如果由于URI查询参数中的输入数据中的错误而在NRF处发现请求失败，则NRF将返回“400 Bad Request”状态代码，其中ProblemDetails IE提供错误的细节。
+If the discovery request fails at the NRF due to NRF internal errors, the NRF shall return "500 Internal Server Error" status code with the ProblemDetails IE providing details of the error.
+
+如果由于NRF内部错误而在NRF上发现请求失败，则NRF将返回“500 Internal Server Error”状态代码，ProblemDetails IE提供错误的详细信息。
+4a.	NRF-2 forwards the success response to NRF-1.
+
+4A。 NRF-2将成功响应转发给NRF-1。
+4b.	NRF-2 forwards the error response to NRF-1.
+
+4B。 NRF-2将错误响应转发给NRF-1。
+NOTE:	It is not assumed that there can only be two NRF hierarchies, i.e. the NRF-3 can go on to forward the service discovery request to another NRF.
+
+注意：不假设只有两个NRF层次结构，即NRF-3可以继续将服务发现请求转发给另一个NRF。
